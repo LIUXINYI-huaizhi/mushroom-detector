@@ -108,7 +108,7 @@ st.markdown("**示例图测试：**")
 col1, col2 = st.columns(2)
 with col1:
     if st.button("🚫 有毒蘑菇示例"):
-        image = Image.open("static/toxic_example.jpg")
+        image = Image.open("toxic_example.jpg")
         st.image(image, caption="示例：有毒蘑菇", use_container_width=True)
         download_model()
         model, transform, class_names = load_model(MODEL_PATH)
@@ -121,7 +121,7 @@ with col1:
 
 with col2:
     if st.button("✅ 可食蘑菇示例"):
-        image = Image.open("static/edible_example.jpg")
+        image = Image.open("edible_example.jpg")
         st.image(image, caption="示例：可食蘑菇", use_container_width=True)
         download_model()
         model, transform, class_names = load_model(MODEL_PATH)

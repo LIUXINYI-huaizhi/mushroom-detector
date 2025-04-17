@@ -52,6 +52,24 @@ def predict_image(image, model, transform):
         pred = 1 if prob > 0.5 else 0
     return pred, prob
 
+# 文字提醒函数
+def get_interpretation(pred, prob):
+    if pred == 1:
+        if prob >= 0.9:
+            msg = "☠️ 高置信度毒蘑菇，严禁食用"
+        elif prob >= 0.7:
+            msg = "⚠️ 有毒可能性高，请勿食用"
+        else:
+            msg = "❓ 疑似毒蘑菇，请谨慎处理"
+    else:
+        if prob <= 0.3:
+            msg = "✅ 可食蘑菇，可信度高"
+        elif prob <= 0.45:
+            msg = "⚠️ 可食蘑菇，但疑似有毒，请谨慎食用"
+        else:
+            msg = "❓ 模型不确定，建议避免食用"
+    return msg
+
 # Streamlit 页面配置
 st.set_page_config(page_title="蘑菇毒性识别系统", layout="centered")
 st.markdown("""
@@ -90,27 +108,29 @@ st.markdown("**示例图测试：**")
 col1, col2 = st.columns(2)
 with col1:
     if st.button("🚫 有毒蘑菇示例"):
-        image = Image.open("toxic_example.jpg")
+        image = Image.open("static/toxic_example.jpg")
         st.image(image, caption="示例：有毒蘑菇", use_container_width=True)
         download_model()
         model, transform, class_names = load_model(MODEL_PATH)
         pred, prob = predict_image(image, model, transform)
+        msg = get_interpretation(pred, prob)
         if pred == 1:
-            st.markdown("<div class='warning-box'>⚠️ 预测结果：<b>有毒蘑菇</b>（置信度：{:.2f}）</div>".format(prob), unsafe_allow_html=True)
+            st.markdown(f"<div class='warning-box'>{msg}（置信度：{prob:.2f}）</div>", unsafe_allow_html=True)
         else:
-            st.success(f"✅ 可食蘑菇（置信度：{prob:.2f}）")
+            st.success(f"{msg}（置信度：{prob:.2f}）")
 
 with col2:
     if st.button("✅ 可食蘑菇示例"):
-        image = Image.open("edible_example.jpg")
+        image = Image.open("static/edible_example.jpg")
         st.image(image, caption="示例：可食蘑菇", use_container_width=True)
         download_model()
         model, transform, class_names = load_model(MODEL_PATH)
         pred, prob = predict_image(image, model, transform)
+        msg = get_interpretation(pred, prob)
         if pred == 1:
-            st.markdown("<div class='warning-box'>⚠️ 预测结果：<b>有毒蘑菇</b>（置信度：{:.2f}）</div>".format(prob), unsafe_allow_html=True)
+            st.markdown(f"<div class='warning-box'>{msg}（置信度：{prob:.2f}）</div>", unsafe_allow_html=True)
         else:
-            st.success(f"✅ 可食蘑菇（置信度：{prob:.2f}）")
+            st.success(f"{msg}（置信度：{prob:.2f}）")
 
 # 上传图像识别
 st.markdown("---")
@@ -121,7 +141,8 @@ if uploaded_file:
     download_model()
     model, transform, class_names = load_model(MODEL_PATH)
     pred, prob = predict_image(image, model, transform)
+    msg = get_interpretation(pred, prob)
     if pred == 1:
-        st.markdown("<div class='warning-box'>⚠️ 预测结果：<b>有毒蘑菇</b>（置信度：{:.2f}）</div>".format(prob), unsafe_allow_html=True)
+        st.markdown(f"<div class='warning-box'>{msg}（置信度：{prob:.2f}）</div>", unsafe_allow_html=True)
     else:
-        st.success(f"✅ 可食蘑菇（置信度：{prob:.2f}）")
+        st.success(f"{msg}（置信度：{prob:.2f}）")
